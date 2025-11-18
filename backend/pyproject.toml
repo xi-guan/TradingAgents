@@ -1,0 +1,77 @@
+[project]
+name = "tradingagents-backend"
+version = "0.1.0"
+description = "TradingAgents Web Backend"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # FastAPI 核心
+    "fastapi[standard]>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.17",
+
+    # 数据库
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    "psycopg2-binary>=2.9.10",
+
+    # Redis
+    "redis[hiredis]>=5.2.0",
+    "hiredis>=3.0.0",
+
+    # Qdrant
+    "qdrant-client>=1.12.0",
+
+    # 任务队列
+    "celery[redis]>=5.4.0",
+
+    # 认证
+    "fastapi-users[sqlalchemy]>=13.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+
+    # 数据处理
+    "pandas>=2.3.0",
+    "numpy>=2.2.1",
+    "pytz>=2025.2",
+
+    # 中国股市数据源
+    "tushare>=1.4.21",
+    "akshare>=1.16.98",
+
+    # 美股数据源
+    "yfinance>=0.2.63",
+
+    # HTTP 客户端
+    "httpx>=0.28.1",
+    "aiohttp>=3.11.10",
+
+    # 配置管理
+    "pydantic-settings>=2.7.0",
+    "python-dotenv>=1.0.1",
+
+    # 工具
+    "python-json-logger>=3.2.1",
+    "rich>=14.0.0",
+
+    # WebSocket
+    "websockets>=14.1",
+    "python-socketio>=5.11.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=6.0.0",
+    "httpx>=0.28.1",
+    "faker>=33.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
