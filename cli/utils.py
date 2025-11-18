@@ -248,6 +248,12 @@ def get_ollama_models(base_url: str = "http://localhost:11434") -> List[Tuple[st
         List of tuples with (display_name, model_name) for each available model
         Falls back to default models if API is unavailable
     """
+    # Keywords that typically indicate embedding models (not chat models)
+    EMBEDDING_KEYWORDS = [
+        'embed', 'embedding', 'e5-', 'bge-', 'gte-', 'intfloat',
+        'sentence-transformer', 'all-minilm', 'paraphrase'
+    ]
+
     try:
         response = requests.get(f"{base_url}/api/tags", timeout=5)
         response.raise_for_status()
@@ -257,12 +263,19 @@ def get_ollama_models(base_url: str = "http://localhost:11434") -> List[Tuple[st
 
         for model in models_data.get("models", []):
             model_name = model.get("name", "")
+
+            # Filter out embedding models
+            is_embedding = any(keyword in model_name.lower() for keyword in EMBEDDING_KEYWORDS)
+            if is_embedding:
+                continue
+
             # Clean up model name (remove :latest if present)
             display_name = model_name.replace(":latest", "")
             models.append((f"{display_name} (local)", model_name))
 
         if not models:
-            console.print("[yellow]Warning: No Ollama models found. Using defaults.[/yellow]")
+            console.print("[yellow]Warning: No chat models found in Ollama. Using defaults.[/yellow]")
+            console.print("[yellow]Note: Embedding models are filtered out.[/yellow]")
             return [
                 ("llama3.1 local", "llama3.1"),
                 ("llama3.2 local", "llama3.2"),
