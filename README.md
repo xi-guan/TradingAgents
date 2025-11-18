@@ -159,7 +159,47 @@ cp .env.example .env
 # Edit .env with your actual API keys
 ```
 
-**Note:** We are happy to partner with Alpha Vantage to provide robust API support for TradingAgents. You can get a free AlphaVantage API [here](https://www.alphavantage.co/support/#api-key), TradingAgents-sourced requests also have increased rate limits to 60 requests per minute with no daily limits. Typically the quota is sufficient for performing complex tasks with TradingAgents thanks to Alpha Vantage’s open-source support program. If you prefer to use OpenAI for these data sources instead, you can modify the data vendor settings in `tradingagents/default_config.py`.
+**Note:** We are happy to partner with Alpha Vantage to provide robust API support for TradingAgents. You can get a free AlphaVantage API [here](https://www.alphavantage.co/support/#api-key), TradingAgents-sourced requests also have increased rate limits to 60 requests per minute with no daily limits. Typically the quota is sufficient for performing complex tasks with TradingAgents thanks to Alpha Vantage's open-source support program. If you prefer to use OpenAI for these data sources instead, you can modify the data vendor settings in `tradingagents/default_config.py`.
+
+### Optional: Data Directory Configuration
+
+By default, TradingAgents uses `./data` as the data directory for local data sources. If you need to use a custom data directory (e.g., for local historical data), you can set the `TRADINGAGENTS_DATA_DIR` environment variable:
+
+```bash
+export TRADINGAGENTS_DATA_DIR=/path/to/your/data
+```
+
+Or add it to your `.env` file:
+```bash
+TRADINGAGENTS_DATA_DIR=/path/to/your/data
+```
+
+**Note:** The local data vendor option requires the Tauric TradingDB dataset, which is currently in development. For most use cases, we recommend using the default configuration with yfinance and Alpha Vantage APIs.
+
+### Using Ollama (Local LLMs)
+
+If you're using [Ollama](https://ollama.ai/) to run local models, there are important compatibility considerations:
+
+**Ollama Limitations:**
+- Ollama only supports standard OpenAI API endpoints (`chat.completions.create`)
+- Ollama **does NOT support** experimental OpenAI features like `responses.create()` API or `web_search_preview` tool
+- Therefore, you **cannot** use `"openai"` vendor for `news_data` when using Ollama
+
+**Recommended Configuration for Ollama:**
+
+When running with Ollama, make sure your configuration uses Alpha Vantage or Google for news data:
+
+```python
+from tradingagents.default_config import DEFAULT_CONFIG
+
+config = DEFAULT_CONFIG.copy()
+config["backend_url"] = "http://localhost:11434/v1"
+config["deep_think_llm"] = "qwen2.5:32b"      # Use Ollama model names
+config["quick_think_llm"] = "llama3.2:latest"  # Use Ollama model names
+config["data_vendors"]["news_data"] = "alpha_vantage"  # DO NOT use "openai" with Ollama
+```
+
+The CLI will automatically handle Ollama configuration when you select "Ollama" as your LLM provider.
 
 ### CLI Usage
 

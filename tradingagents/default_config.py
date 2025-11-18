@@ -3,7 +3,7 @@ import os
 DEFAULT_CONFIG = {
     "project_dir": os.path.abspath(os.path.join(os.path.dirname(__file__), ".")),
     "results_dir": os.getenv("TRADINGAGENTS_RESULTS_DIR", "./results"),
-    "data_dir": "/Users/yluo/Documents/Code/ScAI/FR1-data",
+    "data_dir": os.getenv("TRADINGAGENTS_DATA_DIR", "./data"),
     "data_cache_dir": os.path.join(
         os.path.abspath(os.path.join(os.path.dirname(__file__), ".")),
         "dataflows/data_cache",
@@ -13,6 +13,10 @@ DEFAULT_CONFIG = {
     "deep_think_llm": "o4-mini",
     "quick_think_llm": "gpt-4o-mini",
     "backend_url": "https://api.openai.com/v1",
+    # NOTE: If using Ollama (backend_url: http://localhost:11434/v1), make sure to:
+    # 1. Use Ollama-compatible model names (e.g., "llama3.2", "qwen2.5", etc.)
+    # 2. DO NOT use "openai" vendor for news_data (Ollama doesn't support responses.create API)
+    # 3. Use "alpha_vantage" or "google" for news_data instead
     # Debate and discussion settings
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,

@@ -2,6 +2,13 @@ from openai import OpenAI
 from .config import get_config
 
 
+# NOTE: These functions use OpenAI's experimental 'responses.create()' API with 'web_search_preview' tool,
+# which may not be available in the standard OpenAI API (https://api.openai.com/v1).
+# This may require a custom backend URL or special API access.
+# If you encounter 404 errors, consider using alternative data vendors (alpha_vantage, google, local)
+# by modifying the data vendor settings in default_config.py.
+
+
 def get_stock_news_openai(query, start_date, end_date):
     config = get_config()
     client = OpenAI(base_url=config["backend_url"])
