@@ -1,7 +1,11 @@
 import questionary
 from typing import List, Optional, Tuple, Dict
+import requests
+from rich.console import Console
 
 from cli.models import AnalystType
+
+console = Console()
 
 ANALYST_ORDER = [
     ("Market Analyst", AnalystType.MARKET),
@@ -149,10 +153,7 @@ def select_shallow_thinking_agent(provider) -> str:
             ("Meta: Llama 3.3 8B Instruct - A lightweight and ultra-fast variant of Llama 3.3 70B", "meta-llama/llama-3.3-8b-instruct:free"),
             ("google/gemini-2.0-flash-exp:free - Gemini Flash 2.0 offers a significantly faster time to first token", "google/gemini-2.0-flash-exp:free"),
         ],
-        "ollama": [
-            ("llama3.1 local", "llama3.1"),
-            ("llama3.2 local", "llama3.2"),
-        ]
+        "ollama": get_ollama_models()  # Dynamically fetch Ollama models
     }
 
     choice = questionary.select(
@@ -211,10 +212,7 @@ def select_deep_thinking_agent(provider) -> str:
             ("DeepSeek V3 - a 685B-parameter, mixture-of-experts model", "deepseek/deepseek-chat-v3-0324:free"),
             ("Deepseek - latest iteration of the flagship chat model family from the DeepSeek team.", "deepseek/deepseek-chat-v3-0324:free"),
         ],
-        "ollama": [
-            ("llama3.1 local", "llama3.1"),
-            ("qwen3", "qwen3"),
-        ]
+        "ollama": get_ollama_models()  # Dynamically fetch Ollama models
     }
     
     choice = questionary.select(
@@ -238,6 +236,48 @@ def select_deep_thinking_agent(provider) -> str:
         exit(1)
 
     return choice
+
+
+def get_ollama_models(base_url: str = "http://localhost:11434") -> List[Tuple[str, str]]:
+    """Fetch available models from local Ollama API.
+
+    Args:
+        base_url: The base URL for Ollama API (default: http://localhost:11434)
+
+    Returns:
+        List of tuples with (display_name, model_name) for each available model
+        Falls back to default models if API is unavailable
+    """
+    try:
+        response = requests.get(f"{base_url}/api/tags", timeout=5)
+        response.raise_for_status()
+
+        models_data = response.json()
+        models = []
+
+        for model in models_data.get("models", []):
+            model_name = model.get("name", "")
+            # Clean up model name (remove :latest if present)
+            display_name = model_name.replace(":latest", "")
+            models.append((f"{display_name} (local)", model_name))
+
+        if not models:
+            console.print("[yellow]Warning: No Ollama models found. Using defaults.[/yellow]")
+            return [
+                ("llama3.1 local", "llama3.1"),
+                ("llama3.2 local", "llama3.2"),
+            ]
+
+        return models
+
+    except requests.exceptions.RequestException as e:
+        console.print(f"[yellow]Warning: Could not connect to Ollama API: {e}[/yellow]")
+        console.print("[yellow]Using default model list. Make sure Ollama is running.[/yellow]")
+        return [
+            ("llama3.1 local", "llama3.1"),
+            ("llama3.2 local", "llama3.2"),
+        ]
+
 
 def select_llm_provider() -> tuple[str, str]:
     """Select the OpenAI api url using interactive selection."""
