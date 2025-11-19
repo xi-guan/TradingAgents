@@ -65,6 +65,10 @@ class Settings(BaseSettings):
         default="https://api.openai.com/v1",
         description="OpenAI Base URL"
     )
+    openai_model_name: str = Field(
+        default="gpt-4",
+        description="OpenAI Model Name"
+    )
 
     # Alpha Vantage API
     alpha_vantage_api_key: str = Field(..., description="Alpha Vantage API Key")

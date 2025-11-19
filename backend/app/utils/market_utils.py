@@ -128,3 +128,29 @@ def get_market_timezone(market: MarketType) -> str:
         "US": "America/New_York",
     }
     return timezone_map.get(market, "UTC")
+
+
+def normalize_tushare_symbol(symbol: str) -> str:
+    """
+    转换为 Tushare 格式的股票代码
+
+    Args:
+        symbol: 股票代码
+
+    Returns:
+        Tushare 格式代码 (如: 000001.SZ, 600000.SH)
+
+    Examples:
+        >>> normalize_tushare_symbol("000001")
+        "000001.SZ"
+        >>> normalize_tushare_symbol("600000.SH")
+        "600000.SH"
+    """
+    normalized, market = normalize_symbol(symbol)
+
+    # Tushare 格式已经是标准格式
+    if market == "CN":
+        return normalized
+
+    # 非 A 股不支持
+    return symbol
