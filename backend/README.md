@@ -76,16 +76,19 @@ alembic upgrade head
 ### 5. 启动服务
 
 ```bash
-# 开发模式
-uvicorn app.main:app --reload
+# 推荐方式：使用 uv
+uv run python -m app.server
 
-# 或使用 Python
-python -m app.main
+# 或者直接使用 Python
+python -m app.server
+
+# 或者使用 uvicorn（不推荐）
+uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
 ```
 
 访问：
-- API 文档: http://localhost:8000/api/docs
-- ReDoc: http://localhost:8000/api/redoc
+- API 文档: http://localhost:8005/api/docs
+- ReDoc: http://localhost:8005/api/redoc
 
 ## 核心功能
 

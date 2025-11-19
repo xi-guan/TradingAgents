@@ -82,15 +82,3 @@ async def health_check():
         "status": "healthy",
         "version": settings.app_version,
     }
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8005,
-        reload=settings.debug,
-        log_level=settings.log_level.lower(),
-    )
