@@ -1,9 +1,12 @@
 """股票筛选 API 路由"""
 
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.dependencies import CurrentUser
 from app.schemas.screener import ScreenerRequest, ScreenerResponse, ScreenerResult
 from app.services.screener_service import ScreenerService
 
@@ -13,7 +16,8 @@ router = APIRouter()
 @router.post("/screen", response_model=ScreenerResponse)
 async def screen_stocks(
     request: ScreenerRequest,
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
 ):
     """
     股票筛选
@@ -59,21 +63,33 @@ async def screen_stocks(
     Returns:
         筛选结果列表和总数
     """
-    results, total = await ScreenerService.screen_stocks(db, request)
+    try:
+        results, total = await ScreenerService.screen_stocks(db, request)
 
-    return ScreenerResponse(
-        total=total,
-        results=[ScreenerResult(**r) for r in results],
-        conditions=request.conditions,
-    )
+        return ScreenerResponse(
+            total=total,
+            results=[ScreenerResult(**r) for r in results],
+            conditions=request.conditions,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"股票筛选失败: {str(e)}"
+        )
 
 
 @router.get("/fields")
-async def get_available_fields():
+async def get_available_fields(current_user: CurrentUser):
     """
     获取可用的筛选字段、运算符和市场列表
 
     Returns:
         字段定义、运算符列表、市场列表
     """
-    return await ScreenerService.get_available_fields()
+    try:
+        return await ScreenerService.get_available_fields()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"获取筛选字段失败: {str(e)}"
+        )

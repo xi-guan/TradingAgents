@@ -2,7 +2,8 @@
 
 from datetime import datetime
 from decimal import Decimal
-from sqlalchemy import String, DateTime, Numeric, BigInteger, Index, func
+from uuid import UUID, uuid4
+from sqlalchemy import String, DateTime, Numeric, BigInteger, Index, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
@@ -12,13 +13,13 @@ class Stock(Base):
 
     __tablename__ = "stocks"
 
-    symbol: Mapped[str] = mapped_column(String(20), primary_key=True)
-    market: Mapped[str] = mapped_column(String(10), primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
-    full_symbol: Mapped[str] = mapped_column(String(30), index=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    symbol: Mapped[str] = mapped_column(String(20), nullable=False)
+    market: Mapped[str] = mapped_column(String(10), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    sector: Mapped[str | None] = mapped_column(String(100))
     industry: Mapped[str | None] = mapped_column(String(100))
-    area: Mapped[str | None] = mapped_column(String(100))
-    list_date: Mapped[str | None] = mapped_column(String(20))
+    description: Mapped[str | None] = mapped_column()
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -31,11 +32,12 @@ class Stock(Base):
     )
 
     __table_args__ = (
-        Index("idx_stock_full_symbol", "full_symbol"),
+        Index("ix_stocks_symbol_market", "symbol", "market", unique=True),
+        Index("ix_stocks_market", "market"),
     )
 
     def __repr__(self) -> str:
-        return f"<Stock {self.full_symbol} {self.name}>"
+        return f"<Stock {self.symbol} ({self.market}) {self.name}>"
 
 
 class StockQuote(Base):
@@ -43,33 +45,34 @@ class StockQuote(Base):
 
     __tablename__ = "stock_quotes"
 
-    symbol: Mapped[str] = mapped_column(String(20), primary_key=True)
-    market: Mapped[str] = mapped_column(String(10), primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    stock_id: Mapped[UUID] = mapped_column(ForeignKey("stocks.id", ondelete="CASCADE"), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    price: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    change: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    change_percent: Mapped[Decimal] = mapped_column(Numeric(8, 4))
-    volume: Mapped[int] = mapped_column(BigInteger)
-    amount: Mapped[Decimal] = mapped_column(Numeric(20, 4))
+    open: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    high: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    low: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    close: Mapped[Decimal] = mapped_column(Numeric(20, 4), nullable=False)
+    volume: Mapped[int | None] = mapped_column(BigInteger)
+    prev_close: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    change: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    change_percent: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
 
-    open: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    high: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    low: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    close: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    prev_close: Mapped[Decimal] = mapped_column(Numeric(12, 4))
+    # Additional field for screener (calculated field)
+    market_cap: Mapped[Decimal | None] = mapped_column(Numeric(20, 2))
 
-    timestamp: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+
+    __table_args__ = (
+        Index("ix_stock_quotes_stock_id", "stock_id"),
+        Index("ix_stock_quotes_timestamp", "timestamp"),
     )
 
     def __repr__(self) -> str:
-        return f"<StockQuote {self.symbol} {self.price}>"
+        return f"<StockQuote {self.stock_id} {self.close}>"
 
 
 class StockHistory(Base):
@@ -77,23 +80,22 @@ class StockHistory(Base):
 
     __tablename__ = "stock_history"
 
-    time: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        primary_key=True,
-    )
-    symbol: Mapped[str] = mapped_column(String(20), primary_key=True)
-    market: Mapped[str] = mapped_column(String(10), primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    stock_id: Mapped[UUID] = mapped_column(ForeignKey("stocks.id", ondelete="CASCADE"), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    open: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    high: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    low: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    close: Mapped[Decimal] = mapped_column(Numeric(12, 4))
-    volume: Mapped[int] = mapped_column(BigInteger)
-    amount: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    open: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    high: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    low: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    close: Mapped[Decimal] = mapped_column(Numeric(20, 4), nullable=False)
+    volume: Mapped[int | None] = mapped_column(BigInteger)
+    adj_close: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    interval: Mapped[str] = mapped_column(String(10), server_default="1d", nullable=False)
 
     __table_args__ = (
-        Index("idx_stock_history_symbol_market", "symbol", "market", "time"),
+        Index("ix_stock_history_stock_timestamp", "stock_id", "timestamp", "interval", unique=True),
+        Index("ix_stock_history_timestamp", "timestamp"),
     )
 
     def __repr__(self) -> str:
-        return f"<StockHistory {self.symbol} {self.time}>"
+        return f"<StockHistory {self.stock_id} {self.timestamp}>"

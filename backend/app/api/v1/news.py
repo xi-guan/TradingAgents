@@ -1,11 +1,13 @@
 """新闻数据 API 路由"""
 
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.dependencies import CurrentUser
 from app.schemas.news import NewsArticleResponse
 from app.services.news_service import NewsService
 
@@ -20,7 +22,8 @@ async def get_stock_news(
     hours: int = Query(default=None, ge=1, le=720),  # 最近 N 小时
     from_date: datetime | None = None,
     to_date: datetime | None = None,
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
 ):
     """
     获取股票新闻
@@ -36,11 +39,17 @@ async def get_stock_news(
     Returns:
         新闻列表，按发布时间倒序
     """
-    if hours:
-        return await NewsService.get_latest_news(db, symbol, market, hours, limit)
-    else:
-        return await NewsService.get_news(
-            db, symbol, market, limit, from_date, to_date
+    try:
+        if hours:
+            return await NewsService.get_latest_news(db, symbol, market, hours, limit)
+        else:
+            return await NewsService.get_news(
+                db, symbol, market, limit, from_date, to_date
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"获取新闻失败: {str(e)}"
         )
 
 
@@ -49,7 +58,8 @@ async def refresh_stock_news(
     symbol: str,
     market: str = Query(..., pattern="^(CN|HK|US)$"),
     limit: int = Query(default=10, ge=1, le=100),
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
 ):
     """
     强制刷新股票新闻（从 API 获取最新数据）
@@ -62,11 +72,17 @@ async def refresh_stock_news(
     Returns:
         新闻列表
     """
-    # 从 API 获取
-    articles_data = await NewsService.fetch_news_from_alpha_vantage(symbol, limit)
+    try:
+        # 从 API 获取
+        articles_data = await NewsService.fetch_news_from_alpha_vantage(symbol, limit)
 
-    # 保存到数据库
-    articles = await NewsService.save_news(db, symbol, market, articles_data)
+        # 保存到数据库
+        articles = await NewsService.save_news(db, symbol, market, articles_data)
 
-    # 返回最新数据
-    return await NewsService.get_news(db, symbol, market, limit, fetch_if_empty=False)
+        # 返回最新数据
+        return await NewsService.get_news(db, symbol, market, limit, fetch_if_empty=False)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"刷新新闻失败: {str(e)}"
+        )

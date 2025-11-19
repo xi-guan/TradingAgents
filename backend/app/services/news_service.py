@@ -8,7 +8,7 @@ import httpx
 from sqlalchemy import select, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
+from app.config import settings
 from app.models.news import NewsArticle
 
 

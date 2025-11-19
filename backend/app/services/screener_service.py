@@ -74,24 +74,46 @@ class ScreenerService:
         Returns:
             (结果列表, 总数)
         """
+        # 子查询：获取每只股票最新的报价
+        latest_quote_subq = (
+            select(
+                StockQuote.stock_id,
+                func.max(StockQuote.timestamp).label("max_timestamp"),
+            )
+            .group_by(StockQuote.stock_id)
+            .subquery()
+        )
+
+        # 子查询：获取每只股票最新的财务指标
+        latest_metrics_subq = (
+            select(
+                FinancialMetrics.symbol,
+                FinancialMetrics.market,
+                func.max(FinancialMetrics.report_date).label("max_date"),
+            )
+            .group_by(FinancialMetrics.symbol, FinancialMetrics.market)
+            .subquery()
+        )
+
         # 基础查询 - 联接 Stock, StockQuote, FinancialMetrics
         query = (
-            select(
-                Stock,
-                StockQuote,
-                FinancialMetrics,
+            select(Stock, StockQuote, FinancialMetrics)
+            .outerjoin(
+                latest_quote_subq,
+                Stock.id == latest_quote_subq.c.stock_id,
             )
             .outerjoin(
                 StockQuote,
                 and_(
                     Stock.id == StockQuote.stock_id,
-                    # 只取最新的报价
-                    StockQuote.id
-                    == select(StockQuote.id)
-                    .where(StockQuote.stock_id == Stock.id)
-                    .order_by(desc(StockQuote.timestamp))
-                    .limit(1)
-                    .scalar_subquery(),
+                    StockQuote.timestamp == latest_quote_subq.c.max_timestamp,
+                ),
+            )
+            .outerjoin(
+                latest_metrics_subq,
+                and_(
+                    Stock.symbol == latest_metrics_subq.c.symbol,
+                    Stock.market == latest_metrics_subq.c.market,
                 ),
             )
             .outerjoin(
@@ -99,18 +121,7 @@ class ScreenerService:
                 and_(
                     Stock.symbol == FinancialMetrics.symbol,
                     Stock.market == FinancialMetrics.market,
-                    # 只取最新的指标
-                    FinancialMetrics.id
-                    == select(FinancialMetrics.id)
-                    .where(
-                        and_(
-                            FinancialMetrics.symbol == Stock.symbol,
-                            FinancialMetrics.market == Stock.market,
-                        )
-                    )
-                    .order_by(desc(FinancialMetrics.report_date))
-                    .limit(1)
-                    .scalar_subquery(),
+                    FinancialMetrics.report_date == latest_metrics_subq.c.max_date,
                 ),
             )
         )
