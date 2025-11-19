@@ -6,6 +6,14 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 
 
+class TradingAccountCreate(BaseModel):
+    """创建交易账户"""
+
+    account_type: str = Field(default="paper", pattern="^(paper|live)$")
+    market: str = Field(default="CN", pattern="^(CN|HK|US)$")
+    initial_cash: Decimal = Field(default=Decimal("1000000"), gt=0)
+
+
 class TradingAccountResponse(BaseModel):
     """交易账户响应"""
 
