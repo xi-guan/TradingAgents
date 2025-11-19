@@ -9,3 +9,7 @@ eval_results/
 eval_data/
 *.egg-info/
 .env
+
+# Schema-driven config (generated files, not tracked)
+config/local.yaml
+backend/.env

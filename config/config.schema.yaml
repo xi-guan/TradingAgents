@@ -1,0 +1,165 @@
+# TradingAgents Configuration Schema
+#
+# 配置元数据定义文件
+# - 编辑此文件添加新配置
+# - 运行 ./scripts/setup.sh 自动生成 config/local.yaml 和 .env
+# - 密钥字段（type: secret）自动生成安全随机值
+#
+# 字段说明:
+#   - section: 配置路径（支持嵌套，如 api.port 或 database.host）
+#   - default: 默认值
+#   - type: 字段类型（secret 表示需要自动生成密钥）
+#   - auto_generate: 是否自动生成（仅用于 secret 类型）
+#   - description: 字段说明
+
+# ============================================================
+# 应用基础配置
+# ============================================================
+- section: app.name
+  default: "TradingAgents"
+  description: "应用名称"
+
+- section: app.version
+  default: "0.1.0"
+  description: "应用版本"
+
+- section: app.debug
+  default: true
+  description: "调试模式（生产环境设为 false）"
+
+- section: app.secret_key
+  type: secret
+  auto_generate: true
+  description: "应用密钥（自动生成，用于会话加密等）"
+
+# ============================================================
+# 数据库配置
+# ============================================================
+- section: database.url
+  default: "postgresql+asyncpg://postgres:postgres@localhost:5437/tradingagents"
+  description: "数据库连接 URL"
+
+- section: database.echo
+  default: false
+  description: "是否打印 SQL 语句（调试用）"
+
+# ============================================================
+# Redis 配置
+# ============================================================
+- section: redis.url
+  default: "redis://localhost:6385/0"
+  description: "Redis 连接 URL"
+
+- section: redis.password
+  default: ""
+  description: "Redis 密码（可选）"
+
+# ============================================================
+# Qdrant 配置
+# ============================================================
+- section: qdrant.url
+  default: "http://localhost:6435"
+  description: "Qdrant 向量数据库 URL"
+
+- section: qdrant.api_key
+  default: ""
+  description: "Qdrant API Key（可选）"
+
+# ============================================================
+# JWT 配置
+# ============================================================
+- section: jwt.secret_key
+  type: secret
+  auto_generate: true
+  description: "JWT 签名密钥（自动生成）"
+
+- section: jwt.algorithm
+  default: "HS256"
+  description: "JWT 算法"
+
+- section: jwt.access_token_expire_minutes
+  default: 30
+  description: "访问令牌过期时间（分钟）"
+
+- section: jwt.refresh_token_expire_days
+  default: 7
+  description: "刷新令牌过期时间（天）"
+
+# ============================================================
+# CORS 配置
+# ============================================================
+- section: cors.origins
+  default: '["http://localhost:3005","http://localhost:5173"]'
+  description: "允许的跨域源（JSON 数组字符串）"
+
+# ============================================================
+# OpenAI API
+# ============================================================
+- section: openai.api_key
+  default: "your-openai-api-key"
+  description: "OpenAI API Key（需要手动设置）"
+
+- section: openai.base_url
+  default: "https://api.openai.com/v1"
+  description: "OpenAI Base URL"
+
+# ============================================================
+# Alpha Vantage API
+# ============================================================
+- section: alpha_vantage.api_key
+  default: "your-alpha-vantage-key"
+  description: "Alpha Vantage API Key（需要手动设置）"
+
+# ============================================================
+# Tushare API
+# ============================================================
+- section: tushare.token
+  default: "your-tushare-token"
+  description: "Tushare Token（中国股市数据，需要手动设置）"
+
+# ============================================================
+# Celery 配置
+# ============================================================
+- section: celery.broker_url
+  default: "redis://localhost:6385/1"
+  description: "Celery Broker URL"
+
+- section: celery.result_backend
+  default: "redis://localhost:6385/2"
+  description: "Celery Result Backend"
+
+# ============================================================
+# 日志配置
+# ============================================================
+- section: log.level
+  default: "INFO"
+  description: "日志级别（DEBUG, INFO, WARNING, ERROR, CRITICAL）"
+
+- section: log.file
+  default: "logs/app.log"
+  description: "日志文件路径"
+
+# ============================================================
+# 数据目录
+# ============================================================
+- section: data.dir
+  default: "./data"
+  description: "数据存储目录"
+
+# ============================================================
+# 语言配置
+# ============================================================
+- section: i18n.default_language
+  default: "zh_CN"
+  description: "默认语言（zh_CN 或 en_US）"
+
+# ============================================================
+# 速率限制
+# ============================================================
+- section: rate_limit.enabled
+  default: true
+  description: "是否启用速率限制"
+
+- section: rate_limit.per_minute
+  default: 60
+  description: "每分钟请求限制"
