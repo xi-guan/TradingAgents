@@ -1,7 +1,7 @@
 """API v1 路由"""
 
 from fastapi import APIRouter
-from app.api.v1 import auth, users, stocks, analysis, trading, indicators, watchlist
+from app.api.v1 import auth, users, stocks, analysis, trading, indicators, watchlist, batch_analysis
 
 # 创建主路由
 api_router = APIRouter()
@@ -14,6 +14,7 @@ api_router.include_router(analysis.router, prefix="/analysis", tags=["分析任�
 api_router.include_router(trading.router, prefix="/trading", tags=["模拟交易"])
 api_router.include_router(indicators.router, prefix="/indicators", tags=["技术指标"])
 api_router.include_router(watchlist.router, prefix="/watchlist", tags=["自选股"])
+api_router.include_router(batch_analysis.router, prefix="/batch-analysis", tags=["批量分析"])
 
 @api_router.get("/")
 async def api_root():
@@ -28,5 +29,6 @@ async def api_root():
             "/trading",
             "/indicators",
             "/watchlist",
+            "/batch-analysis",
         ]
     }
