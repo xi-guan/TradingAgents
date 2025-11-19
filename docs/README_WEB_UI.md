@@ -128,9 +128,9 @@ docker-compose logs -f
 ```
 
 访问：
-- 前端：http://localhost:3000
-- 后端 API：http://localhost:8000
-- API 文档：http://localhost:8000/api/docs
+- 前端：http://localhost:3005
+- 后端 API：http://localhost:8005
+- API 文档：http://localhost:8005/api/docs
 
 ### 方式 2：本地开发
 
@@ -309,7 +309,7 @@ MIT
 
 ### 立即可做
 1. **启动项目**：使用 Docker Compose 一键启动
-2. **探索前端**：访问 http://localhost:3000 查看已实现的页面
+2. **探索前端**：访问 http://localhost:3005 查看已实现的页面
 3. **阅读文档**：了解架构设计和开发指南
 
 ### 开发计划

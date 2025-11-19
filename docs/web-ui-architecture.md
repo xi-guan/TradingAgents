@@ -1244,8 +1244,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000
-      - VITE_WS_URL=ws://localhost:8000
+      - VITE_API_BASE_URL=http://localhost:8005
+      - VITE_WS_URL=ws://localhost:8005
     networks:
       - tradingagents-network
     command: pnpm dev --host

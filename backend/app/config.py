@@ -26,11 +26,11 @@ class Settings(BaseSettings):
     database_echo: bool = Field(default=False, description="是否打印 SQL")
 
     # Redis 配置
-    redis_url: str = Field(default="redis://localhost:6379/0", description="Redis URL")
+    redis_url: str = Field(default="redis://localhost:6385/0", description="Redis URL")
     redis_password: Optional[str] = Field(default=None, description="Redis 密码")
 
     # Qdrant 配置
-    qdrant_url: str = Field(default="http://localhost:6333", description="Qdrant URL")
+    qdrant_url: str = Field(default="http://localhost:6435", description="Qdrant URL")
     qdrant_api_key: Optional[str] = Field(default=None, description="Qdrant API Key")
 
     # JWT 配置
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     # CORS 配置
     cors_origins: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:5173"],
+        default=["http://localhost:3005", "http://localhost:5173"],
         description="允许的跨域源"
     )
 
@@ -78,11 +78,11 @@ class Settings(BaseSettings):
 
     # Celery 配置
     celery_broker_url: str = Field(
-        default="redis://localhost:6379/1",
+        default="redis://localhost:6385/1",
         description="Celery Broker URL"
     )
     celery_result_backend: str = Field(
-        default="redis://localhost:6379/2",
+        default="redis://localhost:6385/2",
         description="Celery Result Backend"
     )
 
