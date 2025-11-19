@@ -13,6 +13,8 @@ import { MainLayout } from '@/components/Layout'
 import { AnalysisPage } from '@/pages/Analysis'
 import { DashboardPage } from '@/pages/Dashboard'
 import { LoginPage } from '@/pages/Login'
+import MarketPage from '@/pages/Market'
+import TradingPage from '@/pages/Trading'
 import { useAuthStore, useUiStore } from '@/stores'
 import { websocketService } from '@/services'
 
@@ -58,8 +60,8 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/analysis" element={<AnalysisPage />} />
-              <Route path="/market" element={<div>Market Page (待实现)</div>} />
-              <Route path="/trading" element={<div>Trading Page (待实现)</div>} />
+              <Route path="/market" element={<MarketPage />} />
+              <Route path="/trading" element={<TradingPage />} />
               <Route path="/portfolio" element={<div>Portfolio Page (待实现)</div>} />
               <Route path="/reports" element={<div>Reports Page (待实现)</div>} />
               <Route path="/settings" element={<div>Settings Page (待实现)</div>} />
