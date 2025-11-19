@@ -250,11 +250,11 @@
 
 ### 1. 现代化前端技术栈 ✅
 **我们有，他们没有**:
-- React 18 + TypeScript 5
-- Zustand 状态管理（更轻量）
-- Ant Design 5（企业级 UI）
-- React Router 7（SPA 路由）
-- Vite 6（快速构建）
+- React 19 + TypeScript 5.7（最新版本）
+- Zustand 5.0（状态管理，更轻量）
+- Ant Design 5.22（企业级 UI）
+- React Router 7.1（SPA 路由）
+- Vite 6.0（快速构建）
 
 **TradingAgents-CN**: 使用 Streamlit（Python 服务端渲染）
 

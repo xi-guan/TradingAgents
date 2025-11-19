@@ -32,19 +32,21 @@
 ### 前端技术
 | 组件 | 技术选择 | 版本 | 用途 |
 |------|---------|------|------|
-| 框架 | React | 18.3+ | UI 框架 |
+| 框架 | React | 19.0+ | UI 框架（最新版本）|
+| 类型系统 | TypeScript | 5.7+ | 类型安全 |
 | 状态管理 | Zustand | 5.0+ | 轻量级状态管理 |
 | 包管理器 | pnpm | 9.0+ | 高效包管理 |
 | 代码质量 | Biome | 1.9+ | Linter + Formatter |
 | 构建工具 | Vite | 6.0+ | 快速构建工具 |
 | UI 组件库 | Ant Design | 5.22+ | React 组件库（支持中文）|
 | 图表库 | Apache ECharts | 5.5+ | 数据可视化 |
-| 路由 | React Router | 7.0+ | 前端路由 |
+| 路由 | React Router | 7.1+ | 前端路由 |
 | HTTP 客户端 | Axios | 1.7+ | API 调用 |
 | WebSocket | Socket.IO Client | 4.8+ | 实时通信 |
 | 国际化 | react-i18next | 15.1+ | 多语言支持 |
 | 日期处理 | Day.js | 1.11+ | 轻量级日期库 |
 | 表单 | React Hook Form | 7.54+ | 表单管理 |
+| 不可变数据 | Immer | 10.1+ | 不可变状态更新 |
 
 ### 核心保留技术（现有项目）
 | 组件 | 技术 | 版本 | 用途 |
