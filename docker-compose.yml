@@ -1,0 +1,69 @@
+name: trading-dev
+
+services:
+  # TimescaleDB (PostgreSQL 时序数据库)
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    platform: linux/arm64
+    container_name: tradingagents-timescaledb
+    environment:
+      POSTGRES_DB: tradingagents
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    ports:
+      - "5437:5432"
+    networks:
+      - tradingagents-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (缓存和消息队列)
+  redis:
+    image: redis:7.4-alpine
+    platform: linux/arm64
+    container_name: tradingagents-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6385:6379"
+    networks:
+      - tradingagents-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant (向量数据库)
+  qdrant:
+    image: qdrant/qdrant:latest
+    platform: linux/arm64
+    container_name: tradingagents-qdrant
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "6435:6333"
+      - "6436:6334"
+    networks:
+      - tradingagents-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  timescaledb_data:
+  redis_data:
+  qdrant_data:
+
+networks:
+  tradingagents-network:
+    driver: bridge

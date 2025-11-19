@@ -1,0 +1,38 @@
+{
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "not_found": "Not Found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden"
+  },
+  "auth": {
+    "login_success": "Login successful",
+    "login_failed": "Login failed",
+    "logout_success": "Logout successful",
+    "register_success": "Registration successful",
+    "invalid_credentials": "Invalid username or password",
+    "user_exists": "User already exists",
+    "user_not_found": "User not found"
+  },
+  "analysis": {
+    "started": "Started analyzing stock {symbol}",
+    "completed": "Analysis completed",
+    "failed": "Analysis failed",
+    "invalid_symbol": "Invalid stock symbol",
+    "invalid_date": "Invalid date"
+  },
+  "trading": {
+    "order_created": "Order created successfully",
+    "order_filled": "Order filled",
+    "order_cancelled": "Order cancelled",
+    "insufficient_balance": "Insufficient balance",
+    "invalid_quantity": "Invalid quantity",
+    "market_closed": "Market is closed"
+  },
+  "market": {
+    "cn": "China A-Share",
+    "hk": "Hong Kong",
+    "us": "US Stock"
+  }
+}

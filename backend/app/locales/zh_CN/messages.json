@@ -1,0 +1,38 @@
+{
+  "common": {
+    "success": "成功",
+    "error": "错误",
+    "not_found": "未找到",
+    "unauthorized": "未授权",
+    "forbidden": "禁止访问"
+  },
+  "auth": {
+    "login_success": "登录成功",
+    "login_failed": "登录失败",
+    "logout_success": "退出成功",
+    "register_success": "注册成功",
+    "invalid_credentials": "用户名或密码错误",
+    "user_exists": "用户已存在",
+    "user_not_found": "用户不存在"
+  },
+  "analysis": {
+    "started": "开始分析股票 {symbol}",
+    "completed": "分析完成",
+    "failed": "分析失败",
+    "invalid_symbol": "无效的股票代码",
+    "invalid_date": "无效的日期"
+  },
+  "trading": {
+    "order_created": "订单创建成功",
+    "order_filled": "订单已成交",
+    "order_cancelled": "订单已取消",
+    "insufficient_balance": "余额不足",
+    "invalid_quantity": "无效的数量",
+    "market_closed": "市场已关闭"
+  },
+  "market": {
+    "cn": "A股",
+    "hk": "港股",
+    "us": "美股"
+  }
+}
